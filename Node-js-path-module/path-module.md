@@ -1,10 +1,11 @@
 # 📘 Node.js Path Module - Complete TypeScript Guide
 
-Documentation by: Md. Nazim Uddin
-Email: nazimmuddin10@gmail.com
-Reference: Official Node.js Path Module Documentation
+**Documentation by:** Md. Nazim Uddin  
+**Email:** nazimmuddin10@gmail.com  
+**Reference:** [Official Node.js Path Module Documentation](https://nodejs.org/api/path.html)
 
-Note: This guide is based on the official Node.js documentation. For the most up-to-date and comprehensive information, always refer to the official Node.js path module documentation.
+> **Note:** This guide is based on the official Node.js documentation. For the most up-to-date and comprehensive information, always refer to the [official Node.js path module documentation](https://nodejs.org/api/path.html).
+
 
 ## Table of Contents
 1. [Introduction](#1-introduction)
