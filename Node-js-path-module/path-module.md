@@ -1,125 +1,180 @@
-# 📘 Node.js Path Module - Complete Guide
+# 📘 Node.js Path Module - Complete TypeScript Guide
 
-The `path` module in Node.js provides utilities for working with file and directory paths. It helps you handle and transform file paths in a way that works across different operating systems.
+## Table of Contents
+1. [Introduction](#1-introduction)
+2. [Global Variables](#2-global-variables)
+3. [Path Composition Methods](#3-path-composition-methods)
+4. [Path Decomposition Methods](#4-path-decomposition-methods)
+5. [Path Information Methods](#5-path-information-methods)
+6. [Constants](#6-constants)
+7. [Platform-Specific Methods](#7-platform-specific-methods)
+8. [Practical Examples](#8-practical-examples)
+9. [Summary Table](#9-summary-table)
 
-## Installation & Import
+## Quick Reference Table
 
-No installation needed - the path module is part of Node.js core.
+| Method/Constant | Description | Type Signature |
+|----------------|-------------|----------------|
+| `__dirname` | Current directory path | `string` |
+| `__filename` | Current file path | `string` |
+| `path.join()` | Join path segments | `(...paths: string[]): string` |
+| `path.resolve()` | Resolve to absolute path | `(...paths: string[]): string` |
+| `path.normalize()` | Normalize path | `(path: string): string` |
+| `path.parse()` | Parse path into object | `(path: string): ParsedPath` |
+| `path.format()` | Format object to path | `(pathObject: FormatInputPathObject): string` |
+| `path.basename()` | Get filename | `(path: string, ext?: string): string` |
+| `path.dirname()` | Get directory name | `(path: string): string` |
+| `path.extname()` | Get file extension | `(path: string): string` |
+| `path.isAbsolute()` | Check if absolute path | `(path: string): boolean` |
+| `path.relative()` | Get relative path | `(from: string, to: string): string` |
+| `path.sep` | Path separator | `string` |
+| `path.delimiter` | Path delimiter | `string` |
+| `path.win32` | Windows path methods | `object` |
+| `path.posix` | POSIX path methods | `object` |
+| `path.toNamespacedPath()` | Convert to namespaced path | `(path: string): string` |
 
-```javascript
-// Using ES6 modules (Node.js 14+)
-import path from 'path';
+---
 
-// Using CommonJS
-const path = require('path');
+## 1. Introduction
+
+The `path` module in Node.js provides utilities for working with file and directory paths. This guide includes TypeScript type definitions and examples.
+
+```typescript
+// Importing the path module with TypeScript
+import * as path from 'path';
+
+// Type definitions for path components
+interface PathComponents {
+  root: string;
+  dir: string;
+  base: string;
+  ext: string;
+  name: string;
+}
+
+console.log("=== Node.js Path Module TypeScript Guide ===");
+console.log("Path module imported successfully");
 ```
 
-## Constants
+---
 
-### `path.sep`
-Platform-specific path segment separator.
+## 2. Global Variables
 
-```javascript
-console.log('Separator:', path.sep);
-// Windows: "\"
-// Linux/Mac: "/"
+### 2.1 `__dirname`
+Returns the directory name of the current module as a string.
 
-// Real-life example: Splitting a file path
-const filePath = 'docs/api/user.txt';
-const parts = filePath.split(path.sep);
-console.log('Path parts:', parts); // ['docs', 'api', 'user.txt']
+```typescript
+console.log("\n--- __dirname ---");
+console.log("Current directory:", __dirname);
+// Output example: /Users/username/projects
+
+// TypeScript knows this is a string
+const currentDir: string = __dirname;
+console.log("Type of __dirname:", typeof currentDir);
+// Output: string
 ```
 
-### `path.delimiter`
-Platform-specific path delimiter (used in environment variables like PATH).
+### 2.2 `__filename`
+Returns the filename of the current module as a string.
 
-```javascript
-console.log('Delimiter:', path.delimiter);
-// Windows: ";"
-// Linux/Mac: ":"
+```typescript
+console.log("\n--- __filename ---");
+console.log("Current file:", __filename);
+// Output example: /Users/username/projects/app.ts
 
-// Real-life example: Reading PATH environment variable
-const pathEntries = process.env.PATH.split(path.delimiter);
-console.log('PATH entries:', pathEntries);
+// Type annotation
+const currentFile: string = __filename;
+console.log("Type of __filename:", typeof currentFile);
+// Output: string
 ```
 
-### `__dirname` and `__filename`
-Global variables available in each module.
-
-```javascript
-console.log('Current directory:', __dirname);
-console.log('Current file:', __filename);
-
-// Real-life example: Creating paths relative to current file
-const configPath = path.join(__dirname, 'config', 'app.json');
-console.log('Config path:', configPath);
+**Real-world Example:**
+```typescript
+console.log("\n--- Real-world Example: Config Path ---");
+// Configuring a server with paths relative to current directory
+const configPath: string = path.join(__dirname, 'config', 'server.json');
+console.log("Config file located at:", configPath);
+// Output example: /Users/username/projects/config/server.json
 ```
 
-## Path Composition Methods
+---
 
-### `path.join([...paths])`
-Joins path segments and normalizes the result.
+## 3. Path Composition Methods
 
-```javascript
-// Demo example
-const fullPath = path.join('users', 'docs', 'file.txt');
-console.log('Joined path:', fullPath);
+### 3.1 `path.join(...paths: string[]): string`
+Joins all given path segments together using the platform-specific separator.
+
+```typescript
+console.log("\n--- path.join() ---");
+// Simple Example
+const fullPath: string = path.join('users', 'docs', 'file.txt');
+console.log("Joined path:", fullPath);
 // Output: users/docs/file.txt (Linux/Mac) or users\docs\file.txt (Windows)
 
-// Real-life example: Building API endpoint paths
-const apiVersion = 'v1';
-const endpoint = 'users';
-const resource = 'profile';
-const apiPath = path.join('/api', apiVersion, endpoint, resource);
-console.log('API path:', apiPath); // /api/v1/users/profile
+// Real-world Example: Building API endpoint paths
+const apiPath: string = path.join('/api', 'v1', 'users', 'profile');
+console.log("API Endpoint:", apiPath);
+// Output: /api/v1/users/profile
 ```
 
-### `path.resolve([...paths])`
-Resolves path segments into an absolute path.
+### 3.2 `path.resolve(...paths: string[]): string`
+Resolves a sequence of paths or path segments into an absolute path.
 
-```javascript
-// Demo example
-const absolutePath = path.resolve('src', 'app.js');
-console.log('Absolute path:', absolutePath);
-// Output: /home/user/project/src/app.js (example)
+```typescript
+console.log("\n--- path.resolve() ---");
+// Simple Example
+const absolutePath: string = path.resolve('src', 'app.ts');
+console.log("Resolved absolute path:", absolutePath);
+// Output example: /home/user/project/src/app.ts
 
-// Real-life example: Resolving project root paths
-const projectRoot = path.resolve(__dirname, '..');
-const assetsPath = path.resolve(projectRoot, 'assets', 'images');
-console.log('Assets directory:', assetsPath);
+// Real-world Example: Resolving project root paths
+const projectRoot: string = path.resolve(__dirname, '..');
+const assetsPath: string = path.resolve(projectRoot, 'assets', 'images');
+console.log("Project root:", projectRoot);
+console.log("Assets directory:", assetsPath);
+// Output example: Assets directory: /home/user/project/assets/images
 ```
 
-### `path.normalize(path)`
-Normalizes a path by resolving '..' and '.' segments.
+### 3.3 `path.normalize(path: string): string`
+Normalizes the given path, resolving '..' and '.' segments.
 
-```javascript
-// Demo example
-const messyPath = 'docs/../src/./app//utils';
-const cleanPath = path.normalize(messyPath);
-console.log('Normalized path:', cleanPath); // src/app/utils
+```typescript
+console.log("\n--- path.normalize() ---");
+// Simple Example
+const cleanPath: string = path.normalize('docs/../src/./app//utils');
+console.log("Normalized path:", cleanPath);
+// Output: src/app/utils
 
-// Real-life example: Cleaning user-provided file paths
-function safePath(userInput) {
-  const normalized = path.normalize(userInput);
-  // Prevent directory traversal attacks
+// Real-world Example: Cleaning user input paths with TypeScript type safety
+function safePath(userInput: string): string {
+  const normalized: string = path.normalize(userInput);
   if (normalized.startsWith('..')) {
-    throw new Error('Invalid path');
+    throw new Error('Invalid path: Cannot access parent directories');
   }
   return normalized;
 }
 
-console.log('Safe path:', safePath('files/../docs/./report.txt')); // docs/report.txt
+try {
+  const safeResult = safePath('files/../docs/./report.txt');
+  console.log("Safe path result:", safeResult);
+  // Output: docs/report.txt
+} catch (error) {
+  console.error("Error:", error.message);
+}
 ```
 
-## Path Decomposition Methods
+---
 
-### `path.parse(path)`
-Parses a path into its components.
+## 4. Path Decomposition Methods
 
-```javascript
-// Demo example
-const parsed = path.parse('/home/user/docs/report.pdf');
-console.log('Parsed path:', parsed);
+### 4.1 `path.parse(path: string): PathComponents`
+Returns an object whose properties represent significant elements of the path.
+
+```typescript
+console.log("\n--- path.parse() ---");
+// Simple Example
+const parsed: path.ParsedPath = path.parse('/home/user/docs/report.pdf');
+console.log("Parsed path object:", parsed);
 /* Output:
 {
   root: '/',
@@ -130,37 +185,55 @@ console.log('Parsed path:', parsed);
 }
 */
 
-// Real-life example: File upload processing
-function processUpload(filePath) {
-  const { name, ext, dir } = path.parse(filePath);
+// Real-world Example: File upload processing with TypeScript interface
+interface UploadInfo {
+  originalName: string;
+  filename: string;
+  uploadDir: string;
+  extension: string;
+}
+
+function processUpload(filePath: string): UploadInfo {
+  const { name, ext, dir }: path.ParsedPath = path.parse(filePath);
   
   return {
     originalName: filePath,
     filename: `${name}-${Date.now()}${ext}`,
-    uploadDir: path.join(dir, 'uploads')
+    uploadDir: path.join(dir, 'uploads'),
+    extension: ext
   };
 }
 
 const uploadInfo = processUpload('/tmp/docs/report.pdf');
-console.log('Upload info:', uploadInfo);
+console.log("Upload information:", uploadInfo);
+/* Output:
+{
+  originalName: '/tmp/docs/report.pdf',
+  filename: 'report-1633024567890.pdf',
+  uploadDir: '/tmp/docs/uploads',
+  extension: '.pdf'
+}
+*/
 ```
 
-### `path.format(pathObject)`
-Formats a path object into a path string.
+### 4.2 `path.format(pathObject: path.FormatInputPathObject): string`
+Returns a path string from an object (opposite of `path.parse()`).
 
-```javascript
-// Demo example
-const pathObj = {
+```typescript
+console.log("\n--- path.format() ---");
+// Simple Example
+const pathObj: path.FormatInputPathObject = {
   dir: '/home/user/docs',
   name: 'report',
   ext: '.pdf'
 };
-const formattedPath = path.format(pathObj);
-console.log('Formatted path:', formattedPath); // /home/user/docs/report.pdf
+const formattedPath: string = path.format(pathObj);
+console.log("Formatted path:", formattedPath);
+// Output: /home/user/docs/report.pdf
 
-// Real-life example: Generating download file paths
-function createDownloadPath(userId, filename) {
-  const { name, ext } = path.parse(filename);
+// Real-world Example: Generating download file paths
+function createDownloadPath(userId: string, filename: string): string {
+  const { name, ext }: path.ParsedPath = path.parse(filename);
   
   return path.format({
     dir: path.join('/downloads', userId),
@@ -170,90 +243,113 @@ function createDownloadPath(userId, filename) {
 }
 
 const downloadPath = createDownloadPath('user123', 'document.docx');
-console.log('Download path:', downloadPath);
+console.log("Download path:", downloadPath);
+// Output: /downloads/user123/document-1633024567890.docx
 ```
 
-### `path.basename(path[, ext])`
-Gets the last portion of a path.
+### 4.3 `path.basename(path: string, ext?: string): string`
+Returns the last portion of a path.
 
-```javascript
-// Demo example
-console.log('Basename:', path.basename('/docs/api/user.json')); // user.json
-console.log('Without extension:', path.basename('/docs/api/user.json', '.json')); // user
+```typescript
+console.log("\n--- path.basename() ---");
+// Simple Example
+const filename: string = path.basename('/docs/api/user.json');
+console.log("Filename with extension:", filename);
+// Output: user.json
 
-// Real-life example: File processing based on extension
-function processFile(filePath) {
-  const extension = path.extname(filePath);
-  const filename = path.basename(filePath, extension);
+const nameWithoutExt: string = path.basename('/docs/api/user.json', '.json');
+console.log("Filename without extension:", nameWithoutExt);
+// Output: user
+
+// Real-world Example: File processing with proper typing
+function processFile(filePath: string): string {
+  const extension: string = path.extname(filePath);
+  const filename: string = path.basename(filePath, extension);
   
-  if (extension === '.json') {
-    console.log(`Processing JSON file: ${filename}`);
-  } else if (extension === '.csv') {
-    console.log(`Processing CSV file: ${filename}`);
-  }
+  console.log(`Processing ${extension} file: ${filename}`);
+  return filename;
 }
 
-processFile('/data/users.json'); // Processing JSON file: users
+const processedName = processFile('/data/users.json');
+// Output: Processing .json file: users
+console.log("Processed filename:", processedName);
+// Output: users
 ```
 
-### `path.dirname(path)`
-Gets the directory name of a path.
+### 4.4 `path.dirname(path: string): string`
+Returns the directory name of a path.
 
-```javascript
-// Demo example
-console.log('Directory name:', path.dirname('/docs/api/user.json')); // /docs/api
+```typescript
+console.log("\n--- path.dirname() ---");
+// Simple Example
+const directory: string = path.dirname('/docs/api/user.json');
+console.log("Directory path:", directory);
+// Output: /docs/api
 
-// Real-life example: Creating backup directories
-function createBackup(filePath) {
-  const dir = path.dirname(filePath);
-  const backupDir = path.join(dir, 'backups');
-  const filename = path.basename(filePath);
+// Real-world Example: Creating backup directories
+function createBackup(filePath: string): string {
+  const dir: string = path.dirname(filePath);
+  const backupDir: string = path.join(dir, 'backups');
   
-  console.log(`Creating backup of ${filename} in ${backupDir}`);
-  // fs.mkdirSync(backupDir, { recursive: true });
-  // fs.copyFileSync(filePath, path.join(backupDir, filename));
+  console.log(`Creating backup in ${backupDir}`);
+  return backupDir;
 }
 
-createBackup('/data/config.json');
+const backupDir = createBackup('/data/config.json');
+// Output: Creating backup in /data/backups
+console.log("Backup directory:", backupDir);
+// Output: /data/backups
 ```
 
-### `path.extname(path)`
-Gets the extension of a path.
+### 4.5 `path.extname(path: string): string`
+Returns the extension of the path.
 
-```javascript
-// Demo example
-console.log('Extension:', path.extname('document.pdf')); // .pdf
-console.log('Extension:', path.extname('archive.tar.gz')); // .gz
+```typescript
+console.log("\n--- path.extname() ---");
+// Simple Example
+const extension1: string = path.extname('document.pdf');
+console.log("Extension of document.pdf:", extension1);
+// Output: .pdf
 
-// Real-life example: File type validation
-function isValidFileType(filePath, allowedTypes) {
-  const extension = path.extname(filePath).toLowerCase();
+const extension2: string = path.extname('archive.tar.gz');
+console.log("Extension of archive.tar.gz:", extension2);
+// Output: .gz
+
+// Real-world Example: File type validation with TypeScript
+function isValidFileType(filePath: string, allowedTypes: string[]): boolean {
+  const extension: string = path.extname(filePath).toLowerCase();
   return allowedTypes.includes(extension);
 }
 
 const allowed = ['.jpg', '.jpeg', '.png', '.gif'];
-console.log('Valid image?', isValidFileType('photo.jpg', allowed)); // true
-console.log('Valid image?', isValidFileType('document.pdf', allowed)); // false
+console.log("Is photo.jpg a valid image?", isValidFileType('photo.jpg', allowed));
+// Output: true
+console.log("Is document.pdf a valid image?", isValidFileType('document.pdf', allowed));
+// Output: false
 ```
 
-## Path Information Methods
+---
 
-### `path.isAbsolute(path)`
-Checks if a path is absolute.
+## 5. Path Information Methods
 
-```javascript
-// Demo example
-console.log('Is absolute?', path.isAbsolute('/home/user/file.txt')); // true
-console.log('Is absolute?', path.isAbsolute('docs/file.txt')); // false
+### 5.1 `path.isAbsolute(path: string): boolean`
+Determines if path is an absolute path.
 
-// Real-life example: Path validation in web applications
-function validateFilePath(userInput) {
+```typescript
+console.log("\n--- path.isAbsolute() ---");
+// Simple Example
+const isAbsolute1: boolean = path.isAbsolute('/home/user/file.txt');
+console.log("Is '/home/user/file.txt' absolute?", isAbsolute1);
+// Output: true
+
+const isAbsolute2: boolean = path.isAbsolute('docs/file.txt');
+console.log("Is 'docs/file.txt' absolute?", isAbsolute2);
+// Output: false
+
+// Real-world Example: Path validation with TypeScript
+function validateFilePath(userInput: string): string {
   if (path.isAbsolute(userInput)) {
     throw new Error('Absolute paths are not allowed');
-  }
-  
-  if (userInput.includes('..')) {
-    throw new Error('Parent directory references are not allowed');
   }
   
   return path.normalize(userInput);
@@ -261,49 +357,94 @@ function validateFilePath(userInput) {
 
 try {
   const safePath = validateFilePath('docs/reports/summary.txt');
-  console.log('Valid path:', safePath);
+  console.log("Valid path:", safePath);
+  // Output: docs/reports/summary.txt
 } catch (error) {
-  console.error('Error:', error.message);
+  console.error("Error:", error.message);
 }
 ```
 
-### `path.relative(from, to)`
-Returns the relative path from one directory to another.
+### 5.2 `path.relative(from: string, to: string): string`
+Returns the relative path from 'from' to 'to'.
 
-```javascript
-// Demo example
-const relativePath = path.relative('/data/docs', '/data/images/photo.jpg');
-console.log('Relative path:', relativePath); // ../images/photo.jpg
+```typescript
+console.log("\n--- path.relative() ---");
+// Simple Example
+const relativePath: string = path.relative('/data/docs', '/data/images/photo.jpg');
+console.log("Relative path from /data/docs to /data/images/photo.jpg:", relativePath);
+// Output: ../images/photo.jpg
 
-// Real-life example: Creating relative links in documentation
-function createRelativeLink(currentFile, targetFile) {
-  const currentDir = path.dirname(currentFile);
+// Real-world Example: Creating relative links
+function createRelativeLink(currentFile: string, targetFile: string): string {
+  const currentDir: string = path.dirname(currentFile);
   return path.relative(currentDir, targetFile);
 }
 
 const currentFile = '/docs/api/guides/getting-started.md';
 const targetFile = '/docs/api/reference/classes.md';
 const relativeLink = createRelativeLink(currentFile, targetFile);
-console.log('Relative link:', relativeLink); // ../reference/classes.md
+console.log("Relative link from getting-started.md to classes.md:", relativeLink);
+// Output: ../reference/classes.md
 ```
 
-## Platform-Specific Methods
+---
 
-### `path.win32` and `path.posix`
-Access Windows or POSIX specific implementations.
+## 6. Constants
 
-```javascript
-// Demo example
-const winPath = path.win32.join('C:', 'Users', 'docs', 'file.txt');
-console.log('Windows path:', winPath); // C:\Users\docs\file.txt
+### 6.1 `path.sep: string`
+Provides the platform-specific path segment separator.
 
-const posixPath = path.posix.join('/home', 'user', 'docs', 'file.txt');
-console.log('POSIX path:', posixPath); // /home/user/docs/file.txt
+```typescript
+console.log("\n--- path.sep ---");
+const separator: string = path.sep;
+console.log("Platform path separator:", separator);
+// Windows: "\", Linux/Mac: "/"
 
-// Real-life example: Cross-platform path handling in build tools
-function ensurePosixPath(inputPath) {
+// Real-world Example: Splitting file paths correctly
+const filePath: string = 'docs/api/user.txt';
+const parts: string[] = filePath.split(path.sep);
+console.log("Path parts:", parts);
+// Output: ['docs', 'api', 'user.txt']
+```
+
+### 6.2 `path.delimiter: string`
+Provides the platform-specific path delimiter.
+
+```typescript
+console.log("\n--- path.delimiter ---");
+const delimiter: string = path.delimiter;
+console.log("Platform path delimiter:", delimiter);
+// Windows: ";", Linux/Mac: ":"
+
+// Real-world Example: Reading PATH environment variable
+const pathEnv = process.env.PATH || '';
+const pathEntries: string[] = pathEnv.split(path.delimiter);
+console.log("PATH environment variable entries:", pathEntries);
+// Output: ['/usr/bin', '/usr/local/bin', ...] (example)
+```
+
+---
+
+## 7. Platform-Specific Methods
+
+### 7.1 `path.win32` and `path.posix`
+Provide access to Windows or POSIX specific implementations.
+
+```typescript
+console.log("\n--- Platform-Specific Paths ---");
+// Windows path handling
+const winPath: string = path.win32.join('C:', 'Users', 'docs', 'file.txt');
+console.log("Windows-style path:", winPath);
+// Output: C:\Users\docs\file.txt
+
+// POSIX path handling
+const posixPath: string = path.posix.join('/home', 'user', 'docs', 'file.txt');
+console.log("POSIX-style path:", posixPath);
+// Output: /home/user/docs/file.txt
+
+// Real-world Example: Cross-platform path handling
+function ensurePosixPath(inputPath: string): string {
   if (path.sep === '\\') {
-    // On Windows, convert to POSIX style
     return inputPath.replace(/\\/g, '/');
   }
   return inputPath;
@@ -311,19 +452,27 @@ function ensurePosixPath(inputPath) {
 
 const windowsStyle = 'src\\components\\Button.jsx';
 const posixStyle = ensurePosixPath(windowsStyle);
-console.log('POSIX style path:', posixStyle); // src/components/Button.jsx
+console.log("Original Windows path:", windowsStyle);
+console.log("Converted POSIX path:", posixStyle);
+// Output: src/components/Button.jsx
 ```
 
-### `path.toNamespacedPath(path)`
+### 7.2 `path.toNamespacedPath(path: string): string`
 Converts to a namespace-prefixed path (mainly for Windows).
 
-```javascript
-// Demo example (mainly useful on Windows)
-const nsPath = path.toNamespacedPath('C:\\Users\\file.txt');
-console.log('Namespaced path:', nsPath); // \\?\C:\Users\file.txt
+```typescript
+console.log("\n--- path.toNamespacedPath() ---");
+// Simple Example (Windows only)
+if (process.platform === 'win32') {
+  const nsPath: string = path.toNamespacedPath('C:\\Users\\file.txt');
+  console.log("Namespaced path:", nsPath);
+  // Output: \\?\C:\Users\file.txt
+} else {
+  console.log("This method is primarily useful on Windows systems");
+}
 
-// Real-life example: Handling long paths on Windows
-function handleLongPath(filePath) {
+// Real-world Example: Handling long paths on Windows
+function handleLongPath(filePath: string): string {
   if (process.platform === 'win32' && filePath.length > 260) {
     return path.toNamespacedPath(filePath);
   }
@@ -332,24 +481,30 @@ function handleLongPath(filePath) {
 
 const longPath = 'C:\\very\\long\\path\\that\\exceeds\\windows\\limit\\file.txt';
 const processedPath = handleLongPath(longPath);
-console.log('Processed path:', processedPath);
+console.log("Original path:", longPath);
+console.log("Processed path:", processedPath);
 ```
 
-## Practical Examples
+---
 
-### Example 1: File Upload Handler
+## 8. Practical Examples with TypeScript
 
-```javascript
-function handleFileUpload(originalName, uploadDir) {
-  // Get file extension
-  const extension = path.extname(originalName);
-  
-  // Create unique filename
-  const timestamp = Date.now();
-  const uniqueName = `file_${timestamp}${extension}`;
-  
-  // Create full path
-  const fullPath = path.join(uploadDir, uniqueName);
+### 8.1 File Upload Handler with Type Interface
+```typescript
+console.log("\n--- Practical Example: File Upload Handler ---");
+interface FileUploadInfo {
+  originalName: string;
+  savedName: string;
+  fullPath: string;
+  extension: string;
+  uploadDir: string;
+}
+
+function handleFileUpload(originalName: string, uploadDir: string): FileUploadInfo {
+  const extension: string = path.extname(originalName);
+  const timestamp: number = Date.now();
+  const uniqueName: string = `file_${timestamp}${extension}`;
+  const fullPath: string = path.join(uploadDir, uniqueName);
   
   return {
     originalName,
@@ -361,42 +516,40 @@ function handleFileUpload(originalName, uploadDir) {
 }
 
 const uploadInfo = handleFileUpload('document.pdf', '/uploads');
-console.log('File upload info:', uploadInfo);
+console.log("File upload information:", uploadInfo);
 ```
 
-### Example 2: Configuration Loader
-
-```javascript
-function loadConfig(configName) {
-  // Determine config path based on environment
-  const configDir = process.env.NODE_ENV === 'production' 
+### 8.2 Configuration Loader with Type Safety
+```typescript
+console.log("\n--- Practical Example: Configuration Loader ---");
+function loadConfig(configName: string): { configPath: string } {
+  const configDir: string = process.env.NODE_ENV === 'production' 
     ? '/etc/app/config' 
     : path.join(__dirname, 'config');
   
-  const configPath = path.join(configDir, `${configName}.json`);
+  const configPath: string = path.join(configDir, `${configName}.json`);
   
   console.log(`Loading config from: ${configPath}`);
-  // const configData = fs.readFileSync(configPath, 'utf8');
-  // return JSON.parse(configData);
-  
   return { configPath };
 }
 
 const dbConfig = loadConfig('database');
-console.log('Database config path:', dbConfig.configPath);
+console.log("Database config path:", dbConfig.configPath);
 ```
 
-### Example 3: Static File Server Helper
+### 8.3 Static File Server Helper with Error Handling
+```typescript
+console.log("\n--- Practical Example: Static File Server ---");
+interface FileServeInfo {
+  requested: string;
+  served: string;
+  exists: boolean;
+}
 
-```javascript
-function serveStaticFile(baseDir, requestedPath) {
-  // Prevent directory traversal attacks
-  const normalizedPath = path.normalize(requestedPath).replace(/^(\.\.(\/|\\|$))+/g, '');
+function serveStaticFile(baseDir: string, requestedPath: string): FileServeInfo {
+  const normalizedPath: string = path.normalize(requestedPath).replace(/^(\.\.(\/|\\|$))+/g, '');
+  const absolutePath: string = path.resolve(path.join(baseDir, normalizedPath));
   
-  // Resolve to absolute path
-  const absolutePath = path.resolve(path.join(baseDir, normalizedPath));
-  
-  // Ensure the path is within the base directory
   if (!absolutePath.startsWith(baseDir)) {
     throw new Error('Invalid path');
   }
@@ -404,30 +557,40 @@ function serveStaticFile(baseDir, requestedPath) {
   return {
     requested: requestedPath,
     served: absolutePath,
-    exists: true // fs.existsSync(absolutePath)
+    exists: true // In real code, check if file exists
   };
 }
 
 const fileInfo = serveStaticFile('/var/www', 'assets/images/logo.png');
-console.log('File serving info:', fileInfo);
+console.log("File serving information:", fileInfo);
 ```
 
-## Summary Table
+---
 
-| Method | Description | Example |
-|--------|-------------|---------|
-| `path.join()` | Join path segments | `path.join('a', 'b')` → `a/b` |
-| `path.resolve()` | Resolve to absolute path | `path.resolve('a')` → `/home/user/a` |
-| `path.normalize()` | Normalize path | `path.normalize('a/../b')` → `b` |
-| `path.parse()` | Parse path into object | `path.parse('/a/b.txt')` → Object |
-| `path.basename()` | Get filename | `path.basename('/a/b.txt')` → `b.txt` |
-| `path.dirname()` | Get directory name | `path.dirname('/a/b.txt')` → `/a` |
-| `path.extname()` | Get file extension | `path.extname('b.txt')` → `.txt` |
-| `path.isAbsolute()` | Check if absolute | `path.isAbsolute('/a')` → `true` |
-| `path.relative()` | Get relative path | `path.relative('/a', '/a/b')` → `b` |
+## 9. Summary Table
 
-## Browser Compatibility Note
+| Method/Constant | Description | Type Signature | Example |
+|----------------|-------------|----------------|---------|
+| `__dirname` | Current directory path | `string` | `console.log(__dirname)` |
+| `__filename` | Current file path | `string` | `console.log(__filename)` |
+| `path.join()` | Join path segments | `(...paths: string[]): string` | `path.join('a', 'b') → 'a/b'` |
+| `path.resolve()` | Resolve to absolute path | `(...paths: string[]): string` | `path.resolve('a') → '/home/user/a'` |
+| `path.normalize()` | Normalize path | `(path: string): string` | `path.normalize('a/../b') → 'b'` |
+| `path.parse()` | Parse path into object | `(path: string): ParsedPath` | `path.parse('/a/b.txt') → ParsedPath` |
+| `path.format()` | Format object to path | `(pathObject: FormatInputPathObject): string` | `path.format({dir: '/a', name: 'b', ext: '.txt'}) → '/a/b.txt'` |
+| `path.basename()` | Get filename | `(path: string, ext?: string): string` | `path.basename('/a/b.txt') → 'b.txt'` |
+| `path.dirname()` | Get directory name | `(path: string): string` | `path.dirname('/a/b.txt') → '/a'` |
+| `path.extname()` | Get file extension | `(path: string): string` | `path.extname('b.txt') → '.txt'` |
+| `path.isAbsolute()` | Check if absolute path | `(path: string): boolean` | `path.isAbsolute('/a') → true` |
+| `path.relative()` | Get relative path | `(from: string, to: string): string` | `path.relative('/a', '/a/b') → 'b'` |
+| `path.sep` | Path separator | `string` | `'a/b'.split(path.sep) → ['a', 'b']` |
+| `path.delimiter` | Path delimiter | `string` | `PATH.split(path.delimiter) → string[]` |
+| `path.win32` | Windows path methods | `object` | `path.win32.join('C:', 'file.txt')` |
+| `path.posix` | POSIX path methods | `object` | `path.posix.join('/home', 'file.txt')` |
+| `path.toNamespacedPath()` | Convert to namespaced path | `(path: string): string` | `path.toNamespacedPath('C:\\file.txt')` |
 
-The path module is a Node.js core module and is not available in browsers. For browser-based path manipulation, consider using the `URL` API or path manipulation libraries.
+```typescript
+console.log("\n=== End of Path Module Guide ===");
+```
 
-This documentation follows the practical, example-focused approach similar to W3Schools, making it easy to understand and implement in real projects.
+This comprehensive TypeScript guide includes a complete reference table at the beginning and proper console.log outputs for all examples, making it easy to understand and use the Node.js path module.
